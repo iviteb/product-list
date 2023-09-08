@@ -10,6 +10,7 @@ import { useItemContext } from './ItemContext'
 import { AVAILABLE, CANNOT_BE_DELIVERED } from './constants/Availability'
 import { opaque } from './utils/opaque'
 import styles from './styles.css'
+import { useProduct } from 'vtex.product-context'
 
 const MAX_ITEM_QUANTITY = 99999
 const CSS_HANDLES = ['quantitySelectorContainer'] as const
@@ -28,12 +29,22 @@ function shouldDisableSelector(availability: string | null | undefined) {
   return !enabledSelectorAvailability.includes(availability ?? '')
 }
 
+type Property = {
+  name: string
+  values: string[]
+}
+
+const MIN_QUANTITY = 'minQuantity'
+
 const QuantitySelector: VFC<Props> = ({
   mode = 'default',
   quantitySelectorStep = 'unitMultiplier',
 }) => {
   const { item, loading, onQuantityChange } = useItemContext()
   const handles = useCssHandles(CSS_HANDLES)
+  const { product } = useProduct()
+
+  const minQuantity = product?.properties?.find((prop: Property) => prop?.name === MIN_QUANTITY)?.values[0] ?? 1
 
   if (loading) {
     return <Loading />
@@ -64,6 +75,7 @@ const QuantitySelector: VFC<Props> = ({
           unitMultiplier={unitMultiplier}
           disabled={shouldDisableSelector(item.availability)}
           measurementUnit={item.measurementUnit ?? undefined}
+          minQuantity={minQuantity}
         />
       </div>
     )
@@ -90,6 +102,7 @@ const QuantitySelector: VFC<Props> = ({
         disabled={shouldDisableSelector(item.availability)}
         unitMultiplier={unitMultiplier}
         measurementUnit={item.measurementUnit ?? undefined}
+        minQuantity={minQuantity}
       />
     </div>
   )
