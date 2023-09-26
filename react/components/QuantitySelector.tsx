@@ -45,6 +45,7 @@ interface Props {
   disabled?: boolean
   unitMultiplier?: number
   measurementUnit?: string
+  minQuantity: number
 }
 
 const getDropdownOptions = ({
@@ -52,17 +53,19 @@ const getDropdownOptions = ({
   intl,
   unitMultiplier,
   measurementUnit,
+  minQuantity,
 }: {
   maxValue: number
   intl: IntlShape
   unitMultiplier: number
   measurementUnit?: string
+  minQuantity: number
 }) => {
   const limit = Math.min(9, maxValue)
   const options = [
     { value: 0, label: `0 - ${intl.formatMessage(messages.remove)}` },
-    ...range(1, limit + 1).map((idx) => ({
-      value: idx,
+    ...range(minQuantity, limit + 1).map((idx) => ({
+      value: Number(idx),
       label: intl.formatMessage(messages.label, {
         quantity: intl.formatNumber(idx * unitMultiplier),
         measurementUnit,
@@ -98,6 +101,7 @@ const QuantitySelector: FC<Props> = ({
   disabled = false,
   unitMultiplier = 1,
   measurementUnit: itemMeasurementUnit,
+  minQuantity,
 }) => {
   const measurementUnit =
     itemMeasurementUnit && itemMeasurementUnit !== 'un'
@@ -114,7 +118,7 @@ const QuantitySelector: FC<Props> = ({
   const [getUpdatedValue] = useQuantitySelectorState({
     maxValue,
     measurementUnit,
-    minValue: 1,
+    minValue: minQuantity,
   })
 
   const normalizedValue = Math.min(value, maxValue)
@@ -160,7 +164,7 @@ const QuantitySelector: FC<Props> = ({
     if (curDisplayValue === '') {
       setDisplayValue(
         intl.formatNumber(
-          parseDisplayValue({ value: '1', maxValue, unitMultiplier }),
+          parseDisplayValue({ value: String(minQuantity), maxValue, unitMultiplier }),
           {
             useGrouping: false,
           }
@@ -220,6 +224,7 @@ const QuantitySelector: FC<Props> = ({
       intl,
       unitMultiplier,
       measurementUnit,
+      minQuantity,
     })
 
     return (

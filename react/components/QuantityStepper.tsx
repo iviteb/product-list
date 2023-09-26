@@ -35,6 +35,7 @@ interface Props {
   disabled?: boolean
   unitMultiplier?: number
   measurementUnit?: string
+  minQuantity: number
 }
 
 const QuantityStepper: VFC<Props> = ({
@@ -45,6 +46,7 @@ const QuantityStepper: VFC<Props> = ({
   disabled,
   unitMultiplier = 1,
   measurementUnit = 'un',
+  minQuantity,
 }) => {
   const intl = useIntl()
 
@@ -74,6 +76,10 @@ const QuantityStepper: VFC<Props> = ({
   const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (
     evt
   ) => {
+    if (Number(evt.target.value) < minQuantity) {
+      return
+    }
+
     setCurrentValue(evt.target.value)
   }
 
@@ -91,6 +97,10 @@ const QuantityStepper: VFC<Props> = ({
 
   const handleDecrease: React.MouseEventHandler = (evt) => {
     evt.preventDefault()
+
+    if (normalizedValue <= minQuantity) {
+      return
+    }
 
     const parsedValue = parseDisplayValue({
       value: normalizedValue.toString(),
